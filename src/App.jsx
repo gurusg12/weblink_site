@@ -13,12 +13,11 @@ function App() {
         const { usage, quota } =
           await navigator.storage.estimate();
 
-        const data = Math.round(usage / 1024 / 1024);
-        const data2 = Math.round(quota / 1024 / 1024);
+const data = (usage / 1024 ** 3).toFixed(2);
+const data2 = (quota / 1024 ** 3).toFixed(2);
 
-        setq(data);
-        setU(data2);
-
+setq(data);
+setU(data2);
         console.log("Used MB:", data);
         console.log("Quota MB:", data2);
       } catch (err) {
@@ -72,8 +71,8 @@ TOTAL                     180
         🖨️ Print Invoice
       </button>
 
-      <h2>Used MB: {q}</h2>
-      <h2>Quota MB: {U}</h2>
+      <h2>Used gb: {q}</h2>
+      <h2>Quota gb: {U}</h2>
 
       {error && <p>{error}</p>}
     </div>
