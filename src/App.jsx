@@ -1,8 +1,42 @@
 import React from "react";
 import "./App.css";
 
+import { useState, useEffect } from "react";
+
+
 function App() {
 
+
+    const [q, setq] = useState("");
+    const [U, setU] = useState("");
+  
+
+
+  
+  const { usage, quota } = await navigator.storage.estimate();
+
+console.log("Used MB:", Math.round(usage / 1024 / 1024));
+console.log("Quota MB:", Math.round(quota / 1024 / 1024));
+
+
+    useEffect(() => {
+    const { usage, quota } = await navigator.storage.estimate();
+
+      const data = Math.round(usage / 1024 / 1024)
+      const data2 = Math.round(quota / 1024 / 1024)
+
+      setq(data)
+      setU(data2)
+      
+      
+
+console.log("Used MB:", Math.round(usage / 1024 / 1024));
+console.log("Quota MB:", Math.round(quota / 1024 / 1024));
+
+  }, []);
+
+
+  
   const handlePrint = () => {
 
     const printData = {
@@ -48,6 +82,9 @@ function App() {
         🖨️ Print Invoice
       </button>
 
+<h1>Used MB: {q}</h1>
+<h1>Quota MB: {U}</h1>
+      
     </div>
   );
 }
