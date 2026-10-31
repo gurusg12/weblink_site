@@ -3,78 +3,57 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
-  const [q, setq] = useState(0);
-  const [U, setU] = useState(0);
-  const [error, setError] = useState("");
+  const [storage, setStorage] = useState({
+    usage: 0,
+    quota: 0,
+    available: 0,
+  });
+
+  const [persistent, setPersistent] = useState(false);
 
   useEffect(() => {
-    const getStorageInfo = async () => {
+    async function getStorageInfo() {
       try {
-        const { usage, quota } =
-          await navigator.storage.estimate();
+        // Get browser storage estimate
+        const estimate = await navigator.storage.estimate();
 
-const data = (usage / 1024 ** 3).toFixed(2);
-const data2 = (quota / 1024 ** 3).toFixed(2);
+        const usage = estimate.usage || 0;
+        const quota = estimate.quota || 0;
 
-setq(data);
-setU(data2);
-        console.log("Used MB:", data);
-        console.log("Quota MB:", data2);
-      } catch (err) {
-        console.error("Storage estimate failed:", err);
-        setError("Unable to get storage information.");
+        // Remaining estimated origin quota
+        const available = quota - usage;
+
+        // Request persistent storage
+        const isPersistent =
+          await navigator.storage.persist();
+
+        setPersistent(isPersistent);
+
+        setStorage({
+          usage: (usage / 1024 ** 3).toFixed(3),
+          quota: (quota / 1024 ** 3).toFixed(3),
+          available: (available / 1024 ** 3).toFixed(3),
+        });
+
+      } catch (error) {
+        console.error(error);
       }
-    };
+    }
 
     getStorageInfo();
   }, []);
 
-  const handlePrint = () => {
-    const printData = {
-      action: "print",
-      text: `
-==============================
-          MY SHOP
-==============================
-
-Invoice No: INV-1001
-Customer: Guru
-
-------------------------------
-Product        Qty       Price
-------------------------------
-Paracetamol     2         100
-Syrup           1          80
-------------------------------
-
-TOTAL                     180
-==============================
-
-          THANK YOU!
-
-
-`,
-    };
-
-    const encodedData = encodeURIComponent(
-      JSON.stringify(printData)
-    );
-
-    window.location.href = `miterprint://${encodedData}`;
-  };
-
   return (
-    <div className="app">
-      <h1>Miter Billing</h1>
+    <div>
+      <h1>Browser Storage Information</h1>
 
-      <button onClick={handlePrint}>
-        🖨️ Print Invoice
-      </button>
+      <h3>Used: {storage.usage} GB</h3>
+      <h3>Quota: {storage.quota} GB</h3>
+      <h3>Remaining: {storage.available} GB</h3>
 
-      <h2>Used gb: {q}</h2>
-      <h2>Quota gb: {U}</h2>
-
-      {error && <p>{error}</p>}
+      <h3>
+        Persistent Storage: {persistent ? "Yes" : "No"}
+      </h3>
     </div>
   );
 }
